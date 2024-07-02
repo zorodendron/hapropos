@@ -17,4 +17,16 @@ data Quantifier = Exists | Forall
 
 type Predicate = String
 
-type Function = (Prop, Prop)
+data Function = Function { arguments :: [Prop], returnValue :: Prop} deriving (Show, Eq)
+
+data VariantData = 
+  VT | -- T 
+  VF | -- F
+  VP | -- P
+  VV | -- Var
+  VN | -- ...
+  VA | 
+  VO |
+  VX | 
+  VI |
+  VQ 
