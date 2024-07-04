@@ -2,7 +2,8 @@
 
 module Typeclasses where
 
-import Prop
+import qualified Prop
+import qualified SmallProp
 
 class ToList a b where
   toDepthList :: a -> [b]
@@ -17,13 +18,27 @@ class PropData a where
 
 -- INSTANCES
 
-instance ToList Prop VariantData where
-  toDepthList T             = [VT]
-  toDepthList F             = [VF]
-  toDepthList (P p)         = [VP] 
-  toDepthList (Var v)       = [VV]
-  toDepthList (Not p)       = [VN] ++ toDepthList p 
-  toDepthList (And p q)     = [VA] ++ toDepthList p ++ toDepthList q
-  toDepthList (Or p q)      = [VO] ++ toDepthList p ++ toDepthList q
-  toDepthList (Xor p q)     = [VX] ++ toDepthList p ++ toDepthList q
-  toDepthList (Implies p q) = [VI] ++ toDepthList p ++ toDepthList q
+instance ToList Prop.Prop Prop.VariantData where
+  toDepthList Prop.T             = [Prop.VT]
+  toDepthList Prop.F             = [Prop.VF]
+  toDepthList (Prop.P p)         = [Prop.VP] 
+  toDepthList (Prop.Var v)       = [Prop.VV]
+  toDepthList (Prop.Not p)       = [Prop.VN] ++ toDepthList p 
+  toDepthList (Prop.And p q)     = [Prop.VA] ++ toDepthList p ++ toDepthList q
+  toDepthList (Prop.Or p q)      = [Prop.VO] ++ toDepthList p ++ toDepthList q
+  toDepthList (Prop.Xor p q)     = [Prop.VX] ++ toDepthList p ++ toDepthList q
+  toDepthList (Prop.Implies p q) = [Prop.VI] ++ toDepthList p ++ toDepthList q
+  toDepthList (Prop.Quant q s t) = 
+    case q of 
+      Prop.Exists -> [Prop.VQE] -- Should recursion be included? 
+      Prop.Forall -> [Prop.VQF] 
+
+instance ToList SmallProp.SmallProp SmallProp.VariantData where
+  toDepthList SmallProp.T             = [SmallProp.VT] 
+  toDepthList SmallProp.F             = [SmallProp.VF]
+  toDepthList (SmallProp.P p)         = [SmallProp.VP]
+  toDepthList (SmallProp.Not p)       = [SmallProp.VN] ++ toDepthList p
+  toDepthList (SmallProp.And p q)     = [SmallProp.VA] ++ toDepthList p ++ toDepthList q
+  toDepthList (SmallProp.Or p q)      = [SmallProp.VO] ++ toDepthList p ++ toDepthList q
+  toDepthList (SmallProp.Xor p q)     = [SmallProp.VX] ++ toDepthList p ++ toDepthList q
+  toDepthList (SmallProp.Implies p q) = [SmallProp.VI] ++ toDepthList p ++ toDepthList q

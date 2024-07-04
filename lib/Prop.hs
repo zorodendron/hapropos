@@ -2,7 +2,7 @@ module Prop where
 
 data Prop = 
         T | F 
-          | P String -- Another proposition
+          | P String -- Another proposition.
           | Var String
           | Not Prop
           | And Prop Prop
@@ -29,4 +29,6 @@ data VariantData =
   VO |
   VX | 
   VI |
-  VQ 
+  VQE | -- Quantifier Exists
+  VQF   -- Quantifier Forall
+
