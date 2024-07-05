@@ -8,7 +8,7 @@ Hapropos is a library and domain-specific language designed for working with log
 
 •	A modal variant of predicate logic is included, allowing for the computational analysis of necessary and possible propositions.
 
-•	Higher-order logic is supported, facilitating more complex logical propositions and relations with arbitrary numbers of relata.
+•	Higher-order logic is supported, allowing more complex logical propositions and relations with arbitrary numbers of relata.
 
 •	Memory-efficient depth vector representations for logical propositons are included. These will be optimised over time.
 
