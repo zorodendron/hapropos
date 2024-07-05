@@ -1,6 +1,6 @@
 # Hapropos
 
-Hapropos is a library and domain-specific language designed for working with logical propositions. It provides a variety of utilities and supports multiple types of logic.
+Hapropos is a library and domain-specific language designed for working with logical propositions. It provides a variety of utilities and types of logic.
 
 # Features
 
