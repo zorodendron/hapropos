@@ -4,13 +4,13 @@ Hapropos is a library and domain-specific language designed for working with log
 
 # Features
 
-•	A variant of predicate logic is supported, enabling the formulation and manipulation of predicates and quantifiers. 
+•	A variant of predicate logic is supported. 
 
-•	A modal variant of predicate logic is included, allowing for the exploration of necessity and possibility within logical frameworks.
+•	A modal variant of predicate logic is included, allowing for the computational analysis of necessary and possible propositions.
 
 •	Support for higher-order logic is provided, facilitating the handling of more complex logical propositions.
 
-•	Depth Vector Representations: Memory-efficient depth vector representations for logical propositons are included. These will be optimised over time.
+•	Memory-efficient depth vector representations for logical propositons are included. These will be optimised over time.
 
 # License
 
