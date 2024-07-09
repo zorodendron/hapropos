@@ -58,13 +58,13 @@ getTFVars (Xor p q)     = getTFVars p <> getTFVars q
 getTFVars (Implies p q) = getTFVars p <> getTFVars q 
 
 evaluate :: PLProp -> EvalMap -> Bool
-evaluate T _ = True
-evaluate F _ = False
-evaluate (P var) env = maybe False id (lookup var env)
-evaluate (Not p) env = not (evaluate p env)
-evaluate (And p q) env = evaluate p env && evaluate q env
-evaluate (Or p q) env = evaluate p env || evaluate q env
-evaluate (Xor p q) env = evaluate p env /= evaluate q env
+evaluate T _               = True
+evaluate F _               = False
+evaluate (P var) env       = maybe False id (lookup var env)
+evaluate (Not p) env       = not (evaluate p env)
+evaluate (And p q) env     = evaluate p env && evaluate q env
+evaluate (Or p q) env      = evaluate p env || evaluate q env
+evaluate (Xor p q) env     = evaluate p env /= evaluate q env
 evaluate (Implies p q) env = not (evaluate p env) || evaluate q env
 
 type EvalMap = [(String, Bool)]
