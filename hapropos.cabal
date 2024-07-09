@@ -18,7 +18,7 @@ common warnings
 
 library
     import:           warnings
-    exposed-modules:  Prop, SmallProp, Typeclasses, PTT.TH, LiquidProp, AST, Parse.MegaParsec, 
+    exposed-modules:  Prop, PLProp, SmallProp, Typeclasses, PTT.TH, LiquidProp, AST, Parse.MegaParsec, 
     -- other-modules:
     -- other-extensions:
     build-depends:    base, 
