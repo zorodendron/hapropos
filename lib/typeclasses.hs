@@ -8,6 +8,14 @@ import qualified SmallProp
 class ToList a b where
   toDepthList :: a -> [b]
 
+class ToTruthTable a b where
+  toTruthTable :: a -> [b]  
+  
+class ToTableau a b where 
+  toTableau :: a -> b
+
+-- Once I have the tableaux set up, I can compile them into proofs in natural deduction or sequent calculus since tableaux are isomorphic to these systems.
+
 class ToSMTLIB a where
   parseToString :: a -> String
   -- parseToAST :: a -> SMTLIBAST
@@ -30,7 +38,7 @@ instance ToList Prop.Prop Prop.VariantData where
   toDepthList (Prop.Implies p q) = [Prop.VI] ++ toDepthList p ++ toDepthList q
   toDepthList (Prop.Quant q s t) = 
     case q of 
-      Prop.Exists -> [Prop.VQE] -- Should recursion be included? 
+      Prop.Exists -> [Prop.VQE] -- Would recursion be good? 
       Prop.Forall -> [Prop.VQF] 
 
 instance ToList SmallProp.SmallProp SmallProp.VariantData where
