@@ -2,11 +2,13 @@
 
 module Typeclasses where
 
-import qualified Prop
-import qualified SmallProp
+import qualified Prop as P
+import qualified SmallProp as SP
+import qualified Data.Vector as V
 
 class ToList a b where
   toDepthList :: a -> [b]
+  toDepthVector :: a -> V.Vector b
 
 class ToTruthTable a b where
   toTruthTable :: a -> [b]  
@@ -26,27 +28,44 @@ class PropData a where
 
 -- INSTANCES
 
-instance ToList Prop.Prop Prop.VariantData where
-  toDepthList Prop.T             = [Prop.VT]
-  toDepthList Prop.F             = [Prop.VF]
-  toDepthList (Prop.P p)         = [Prop.VP] 
-  toDepthList (Prop.Var v)       = [Prop.VV]
-  toDepthList (Prop.Not p)       = [Prop.VN] ++ toDepthList p 
-  toDepthList (Prop.And p q)     = [Prop.VA] ++ toDepthList p ++ toDepthList q
-  toDepthList (Prop.Or p q)      = [Prop.VO] ++ toDepthList p ++ toDepthList q
-  toDepthList (Prop.Xor p q)     = [Prop.VX] ++ toDepthList p ++ toDepthList q
-  toDepthList (Prop.Implies p q) = [Prop.VI] ++ toDepthList p ++ toDepthList q
-  toDepthList (Prop.Quant q s t) = 
+instance ToList P.Prop P.VariantData where
+  toDepthList P.T             = [P.VT]
+  toDepthList P.F             = [P.VF]
+  toDepthList (P.P p)         = [P.VP] 
+  toDepthList (P.Var v)       = [P.VV]
+  toDepthList (P.Not p)       = [P.VN] ++ toDepthList p 
+  toDepthList (P.And p q)     = [P.VA] ++ toDepthList p ++ toDepthList q
+  toDepthList (P.Or p q)      = [P.VO] ++ toDepthList p ++ toDepthList q
+  toDepthList (P.Xor p q)     = [P.VX] ++ toDepthList p ++ toDepthList q
+  toDepthList (P.Implies p q) = [P.VI] ++ toDepthList p ++ toDepthList q
+  toDepthList (P.Quant q s t) = 
     case q of 
-      Prop.Exists -> [Prop.VQE] -- Would recursion be good? 
-      Prop.Forall -> [Prop.VQF] 
+      P.Exists -> [P.VQE] 
+      P.Forall -> [P.VQF] 
 
-instance ToList SmallProp.SmallProp SmallProp.VariantData where
-  toDepthList SmallProp.T             = [SmallProp.VT] 
-  toDepthList SmallProp.F             = [SmallProp.VF]
-  toDepthList (SmallProp.P p)         = [SmallProp.VP]
-  toDepthList (SmallProp.Not p)       = [SmallProp.VN] ++ toDepthList p
-  toDepthList (SmallProp.And p q)     = [SmallProp.VA] ++ toDepthList p ++ toDepthList q
-  toDepthList (SmallProp.Or p q)      = [SmallProp.VO] ++ toDepthList p ++ toDepthList q
-  toDepthList (SmallProp.Xor p q)     = [SmallProp.VX] ++ toDepthList p ++ toDepthList q
-  toDepthList (SmallProp.Implies p q) = [SmallProp.VI] ++ toDepthList p ++ toDepthList q
+  toDepthVector P.T             = V.singleton P.VT
+  toDepthVector P.F             = V.singleton P.VF
+  toDepthVector (P.P p)         = V.singleton P.VP
+  toDepthVector (P.Var v)       = V.singleton P.VV
+  toDepthVector (P.Not p)       = V.singleton P.VN V.++ toDepthVector p
+  toDepthVector (P.And p q)     = V.singleton P.VA V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (P.Or p q)      = V.singleton P.VO V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (P.Xor p q)     = V.singleton P.VX V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (P.Implies p q) = V.singleton P.VI V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (P.Quant q s t) =
+    case q of
+      P.Exists -> V.singleton P.VQE V.++ toDepthVector s V.++ toDepthVector (P.Var t)
+      P.Forall -> V.singleton P.VQF V.++ toDepthVector s V.++ toDepthVector (P.Var t)
+
+
+instance ToList SP.SmallProp SP.VariantData where
+  toDepthList SP.T             = [SP.VT] 
+  toDepthList SP.F             = [SP.VF]
+  toDepthList (SP.P p)         = [SP.VP]
+  toDepthList (SP.Not p)       = [SP.VN] ++ toDepthList p
+  toDepthList (SP.And p q)     = [SP.VA] ++ toDepthList p ++ toDepthList q
+  toDepthList (SP.Or p q)      = [SP.VO] ++ toDepthList p ++ toDepthList q
+  toDepthList (SP.Xor p q)     = [SP.VX] ++ toDepthList p ++ toDepthList q
+  toDepthList (SP.Implies p q) = [SP.VI] ++ toDepthList p ++ toDepthList q
+
+  
