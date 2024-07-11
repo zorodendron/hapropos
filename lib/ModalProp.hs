@@ -20,8 +20,24 @@ type Predicate = String
 
 data Function = Function { arguments :: [Prop], returnValue :: Prop} deriving (Show, Eq)
 
+data VariantData = 
+  VT | -- T 
+  VF | -- F
+  VP | -- P
+  VV | -- Var
+  VN | -- ...
+  VA | 
+  VO |
+  VX | 
+  VI |
+  VQE | -- Quantifier Exists
+  VQF | -- Quantifier Forall
+  VMN | -- ModalOperator Necessarily
+  VMP   -- ModalOperator Possibly
+
 -- MODAL LOGIC
 
-data ModalOperator = Necessarily | Possibly
+data ModalOperator = Necessarily | Possibly 
+  deriving (Read, Show, Eq)
 
 type World = [Prop]

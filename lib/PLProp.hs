@@ -80,6 +80,3 @@ makeTruthTable varNames truthFunctions =
     varCols = makeVColumns varNames rows
     tfCols = map (\tf -> makeTFColumn tf varCols) truthFunctions
 
-testTT :: IO ()
-testTT = do
-  print (PLProp.makeTFColumn (PLProp.Implies (PLProp.P "P") (PLProp.P "Q")) (PLProp.makeVColumns ["P", "Q"] [[True, True],[True,False]]))

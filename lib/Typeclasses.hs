@@ -4,6 +4,7 @@ module Typeclasses where
 
 import qualified Prop as P
 import qualified SmallProp as SP
+import qualified ModalProp as MP
 import qualified Data.Vector as V
 
 class ToList a b where
@@ -68,4 +69,48 @@ instance ToList SP.SmallProp SP.VariantData where
   toDepthList (SP.Xor p q)     = [SP.VX] ++ toDepthList p ++ toDepthList q
   toDepthList (SP.Implies p q) = [SP.VI] ++ toDepthList p ++ toDepthList q
 
-  
+  toDepthVector SP.T             = V.singleton SP.VT 
+  toDepthVector SP.F             = V.singleton SP.VF
+  toDepthVector (SP.P p)         = V.singleton SP.VP V.++ toDepthVector p
+  toDepthVector (SP.Not p)       = V.singleton SP.VN V.++ toDepthVector p
+  toDepthVector (SP.And p q)     = V.singleton SP.VA V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (SP.Or p q)      = V.singleton SP.VO V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (SP.Xor p q)     = V.singleton SP.VX V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (SP.Implies p q) = V.singleton SP.VI V.++ toDepthVector p V.++ toDepthVector q
+
+instance ToList MP.Prop MP.VariantData where
+  toDepthList MP.T             = [MP.VT]
+  toDepthList MP.F             = [MP.VF]
+  toDepthList (MP.P p)         = [MP.VP]
+  toDepthList (MP.Var v)       = [MP.VV]
+  toDepthList (MP.Not p)       = [MP.VN] ++ toDepthList p
+  toDepthList (MP.And p q)     = [MP.VA] ++ toDepthList p ++ toDepthList q
+  toDepthList (MP.Or p q)      = [MP.VO] ++ toDepthList p ++ toDepthList q
+  toDepthList (MP.Xor p q)     = [MP.VX] ++ toDepthList p ++ toDepthList q
+  toDepthList (MP.Implies p q) = [MP.VI] ++ toDepthList p ++ toDepthList q
+  toDepthList (MP.Quant q s t) =
+    case q of
+      MP.Exists -> [MP.VQE]
+      MP.Forall -> [MP.VQF]
+  toDepthList (MP.Modal m p)  =
+    case m of
+      MP.Necessarily -> [MP.VMN]
+      MP.Possibly    -> [MP.VMP]
+
+  toDepthVector MP.T             = V.singleton MP.VT
+  toDepthVector MP.F             = V.singleton MP.VF
+  toDepthVector (MP.P p)         = V.singleton MP.VP
+  toDepthVector (MP.Var v)       = V.singleton MP.VV
+  toDepthVector (MP.Not p)       = V.singleton MP.VN V.++ toDepthVector p
+  toDepthVector (MP.And p q)     = V.singleton MP.VA V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (MP.Or p q)      = V.singleton MP.VO V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (MP.Xor p q)     = V.singleton MP.VX V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (MP.Implies p q) = V.singleton MP.VI V.++ toDepthVector p V.++ toDepthVector q
+  toDepthVector (MP.Quant q s t) =
+    case q of
+      MP.Exists -> V.singleton MP.VQE V.++ toDepthVector s V.++ toDepthVector (MP.Var t)
+      MP.Forall -> V.singleton MP.VQF V.++ toDepthVector s V.++ toDepthVector (MP.Var t)
+  toDepthVector (MP.Modal m p)   =
+    case m of 
+      MP.Necessarily -> V.singleton MP.VMN
+      MP.Possibly    -> V.singleton MP.VMP
