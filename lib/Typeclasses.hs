@@ -10,6 +10,7 @@ import qualified Data.Vector as V
 class ToList a b where
   toDepthList :: a -> [b]
   toDepthVector :: a -> V.Vector b
+  toContiguousDepthVector :: [a] -> V.Vector b
 
 class ToTruthTable a b where
   toTruthTable :: a -> [b]  
@@ -57,6 +58,8 @@ instance ToList P.Prop P.VariantData where
     case q of
       P.Exists -> V.singleton P.VQE V.++ toDepthVector s V.++ toDepthVector (P.Var t)
       P.Forall -> V.singleton P.VQF V.++ toDepthVector s V.++ toDepthVector (P.Var t)
+
+  toContiguousDepthVector propositionVector = V.concat $ map toDepthVector propositionVector 
 
 
 instance ToList SP.SmallProp SP.VariantData where
