@@ -7,6 +7,15 @@ import qualified SmallProp as SP
 import qualified ModalProp as MP
 import qualified Data.Vector as V
 
+-- RULES OF INFERENCE
+
+class InferenceRule prop where
+  modusPonens :: prop -> prop -> Either String prop
+  implicationElimination :: prop -> Either String (prop, prop)
+
+
+-- DATA TRANSFORMATIONS
+
 class ToList a b where
   toDepthList :: a -> [b]
   toDepthVector :: a -> V.Vector b
@@ -30,6 +39,15 @@ class PropData a where
 
 -- INSTANCES
 
+instance InferenceRule P.Prop where
+  modusPonens (P.Implies p q) r =
+    if p == r then Right q
+    else Left "The antecedent does not match."
+  modusPonens _ _ = Left "The first proposition is not an implication."
+
+  implicationElimination (P.Implies p q) = Right (p, q)
+  implicationElimination _ = Left "Implication elimination can only be applied to implications (Implies Prop Prop)."
+
 instance ToList P.Prop P.VariantData where
   toDepthList P.T             = [P.VT]
   toDepthList P.F             = [P.VF]
@@ -40,8 +58,8 @@ instance ToList P.Prop P.VariantData where
   toDepthList (P.Or p q)      = [P.VO] ++ toDepthList p ++ toDepthList q
   toDepthList (P.Xor p q)     = [P.VX] ++ toDepthList p ++ toDepthList q
   toDepthList (P.Implies p q) = [P.VI] ++ toDepthList p ++ toDepthList q
-  toDepthList (P.Quant q s t) = 
-    case q of 
+  toDepthList (P.Quant q p predicate) = 
+    case q of  
       P.Exists -> [P.VQE] 
       P.Forall -> [P.VQF] 
 
