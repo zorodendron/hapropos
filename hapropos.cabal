@@ -14,12 +14,12 @@ extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 
 common warnings
-    ghc-options: -Wall
+    ghc-options: -fno-warn-unused-matches
 
 library
     import:           warnings
-    exposed-modules:  Prop, PLProp, SmallProp, Typeclasses, PTT.TH, LiquidProp, AST, Parse.MegaParsec, 
-    -- other-modules:
+    exposed-modules:  Prop, PLProp, SmallProp, Typeclasses, PTT.TH, LiquidProp, AST, Parse.MegaParsec,                       
+    other-modules:    Examples.NegationNormalForm 
     -- other-extensions:
     build-depends:    base, 
                       vector ==0.13.1.0,
@@ -29,7 +29,7 @@ library
                       parser-combinators ==1.3.0,
                       template-haskell
 
-    hs-source-dirs:   lib
+    hs-source-dirs:  lib
     default-language: GHC2021
 
 --test-suite propos-tests
