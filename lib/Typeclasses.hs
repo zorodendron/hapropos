@@ -29,6 +29,19 @@ class ToTableau a b where
 
 -- Once I have the tableaux set up, I can compile them into proofs in natural deduction or sequent calculus since tableaux are isomorphic to these systems.
 
+-- NORMAL FORM TRANSFORMATIONS
+
+class ToNormalForm a where
+  toConjunctiveNormalForm :: a -> a
+  toDisjunctiveNormalForm :: a -> a
+  toNegationNormalForm :: a -> a
+  toPrenexNormalForm :: a -> a
+  toSkolemNormalForm :: a -> a
+  toClauseNormalForm :: a -> a
+  toLinearNormalForm :: a -> a
+  toHornNormalForm :: a -> a
+  toKromNormalForm :: a -> a
+
 class ToSMTLIB a where
   parseToString :: a -> String
   -- parseToAST :: a -> SMTLIBAST
