@@ -6,25 +6,15 @@ import Control.Monad (replicateM)
 -- Propositional Logic
 
 data PLProp =
-  T | F
-    | P String
+      TruthValue Bool
+    | Var String
     | Not PLProp
     | And PLProp PLProp
     | Or PLProp PLProp
     | Implies PLProp PLProp
     deriving (Show, Eq)
 
-data VariantData = VT | VF | VP | VN | VA | VO | VX | VI
-
--- Collect all atomic propositions in a proposition.
-collectProps :: PLProp -> [String]
-collectProps T             = []
-collectProps F             = []
-collectProps (P p)         = [p]
-collectProps (Not p)       = collectProps p
-collectProps (And p q)     = collectProps p ++ collectProps q
-collectProps (Or p q)      = collectProps p ++ collectProps q
-collectProps (Implies p q) = collectProps p ++ collectProps q
+data VariantData = VT | VF | VP | VN | VA | VO | VI
 
 data VariableColumn      = VariableColumn      { columnVar :: String, vcBooleans :: [Bool] } deriving Show
 data TruthFunctionColumn = TruthFunctionColumn { truthFN :: PLProp, tfcBooleans :: [Bool] } deriving Show
@@ -45,19 +35,19 @@ makeTFColumn truthFunction varColumns =
     varNames = map columnVar varColumns
     evalRow row = evaluate truthFunction (makeEvalMap varNames row)
 
+-- Returns a list of all variables in a proposition.
 getTFVars :: PLProp -> Maybe [String]
-getTFVars T             = Nothing
-getTFVars F             = Nothing
-getTFVars (P s)         = Just [s]
+getTFVars (TruthValue t)  = Nothing
+getTFVars (Var s)         = Just [s]
 getTFVars (Not p)       = getTFVars p
 getTFVars (And p q)     = getTFVars p <> getTFVars q
 getTFVars (Or p q)      = getTFVars p <> getTFVars q
-getTFVars (Implies p q) = getTFVars p <> getTFVars q 
+getTFVars (Implies p q) = getTFVars p <> getTFVars q
 
+-- Evaluates a proposition given an environment with truth assignments.
 evaluate :: PLProp -> EvalMap -> Bool
-evaluate T _               = True
-evaluate F _               = False
-evaluate (P var) env       = maybe False id (lookup var env)
+evaluate (TruthValue t) env  = t
+evaluate (Var var) env     = maybe False id (lookup var env) -- returns False if the variable is not in the environment, True otherwise.
 evaluate (Not p) env       = not (evaluate p env)
 evaluate (And p q) env     = evaluate p env && evaluate q env
 evaluate (Or p q) env      = evaluate p env || evaluate q env
@@ -75,4 +65,3 @@ makeTruthTable varNames truthFunctions =
     rows = replicateM (length varNames) [True, False]
     varCols = makeVColumns varNames rows
     tfCols = map (\tf -> makeTFColumn tf varCols) truthFunctions
-

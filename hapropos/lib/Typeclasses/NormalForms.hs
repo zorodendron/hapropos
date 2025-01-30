@@ -43,6 +43,7 @@ instance ToNormalForm P.Prop where
   toNegationNormalForm (P.Not (Quant Exists s p))   = Quant Forall s (toNegationNormalForm (P.Not p))
   toNegationNormalForm (P.Not (Quant Forall s p))   = Quant Exists s (toNegationNormalForm (P.Not p))
   toNegationNormalForm (P.Not (P.Not p))            = toNegationNormalForm p
+  toNegationNormalForm (P.Not x) = P.Not (toNegationNormalForm x)
   toNegationNormalForm (P.And (P.Implies p q) (P.Implies q' p'))
     | p == p' && q == q' =
         P.And

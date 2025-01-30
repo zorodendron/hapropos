@@ -18,89 +18,128 @@ import AST
 type Parser = Parsec Void Text
 
 -- Main parser for the Prop data type.
-propParser :: Parser Prop
-propParser = choice
-  [ trueParser           -- Parses "True"
-  , falseParser          -- Parses "False"
-  --, varParser            -- Parses expressions like "Var x"
-  , quotedVarParser      -- Parses expressions like "Var "x""
-  , notParser            -- Parses expressions like "Not P"
-  , andParser            -- Parses expressions like "And P Q"
-  , orParser             -- Parses expressions like "Or P Q"
-  , impliesParser
-  , parens propParser    -- Parses expressions like "(And P Q)"
-  ]
+parseProp :: Parser Prop
+parseProp =
+      parseTer   -- a Term can be a Prop
+  <|> parseNot
+  <|> parseAnd
+  <|> parseOr
+  <|> parseImplies
+  <|> parseQuant
+  <|> parseParens parseProp
 
--- Variant parsers.
+--parseTermProp :: Parser Prop
+--parseTermProp = Term <$> parseTerm -- promote a Term to a Prop
 
-trueParser :: Parser Prop
-trueParser = T <$ symbol "T"
-
-falseParser :: Parser Prop
-falseParser = F <$ symbol "F"
-
-varParser :: Parser Prop
-varParser = Var <$> (symbol "Var" *> some letterChar)
-
---quotedVarParser :: Parser Prop
---quotedVarParser = Var <$> between (char '"') (char '"') (many (noneOf ['"']))
-
-quotedVarParser = do
-  _ <- symbol "Var"
-  name <- between (char '"') (char '"') (many (noneOf ['"']))
-  return $ Var name
-
-
-qvp2 = do
-  q1 <- char '"'
-  p <- varParser
-  q2 <- char '"'
-  return p
-
-
-andParser :: Parser Prop
-andParser = do
-  _ <- symbol "And"
-  p1 <- propParser
-  p2 <- propParser
-  return $ And p1 p2
-
-orParser :: Parser Prop
-orParser = do
-  _ <- symbol "Or"
-  p1 <- propParser
-  p2 <- propParser
-  return $ And p1 p2
-
-impliesParser :: Parser Prop
-impliesParser = do
-  _ <- symbol "Implies"
-  p1 <- propParser
-  p2 <- propParser
-  return $ Implies p1 p2
-
-notParser :: Parser Prop
-notParser = do
-  _ <- symbol "Not"
-  p <- propParser
+parseNot :: Parser Prop
+parseNot = do
+  string "Not"
+  space
+  p <- parseProp
   return $ Not p
 
-quantParser :: Parser Prop
-quantParser = do
-  q <- quantifierParser
-  prop <- propParser
-  pred <- predicateParser
-  return $ Quant q prop pred
+parseAnd :: Parser Prop
+parseAnd = do
+  char '('
+  p1 <- parseProp
+  string "&&"
+  p2 <- parseProp
+  char ')'
+  return $ And p1 p2
 
-quantifierParser :: Parser Quantifier
-quantifierParser = (Exists <$ symbol "Exists") <|> (Forall <$ symbol "Forall")
+parseOr :: Parser Prop
+parseOr = do
+  char '('
+  p1 <- parseProp
+  string "||"
+  p2 <- parseProp
+  char ')'
+  return $ Or p1 p2
 
-predicateParser :: Parser String
-predicateParser = some letterChar <* spaceConsumer
+parseImplies :: Parser Prop
+parseImplies = do
+  i <- string "Implies"
+  space
+  char '('
+  p1 <- parseProp
+  char ')'
+  space
+  char '('
+  p2 <- parseProp
+  char ')'
+  return $ Implies p1 p2
+
+  -- parse Quant
+parseQuant :: Parser Prop
+parseQuant = do
+  string "Quant" -- matches "Quant"
+  space
+  quantifier <- parseQuantifier
+  space
+  var <- parseQuotedString -- parse the string variable
+  space
+  p <- parseProp -- parse the inner proposition
+  return $ Quant quantifier var p
+
+-- parse the quantifier (Forall or Exists)
+parseQuantifier :: Parser Quantifier
+parseQuantifier =
+      (string "Forall" >> return Forall)
+  <|> (string "Exists" >> return Exists)
+
+-- helper to parse quoted strings
+parseQuotedString :: Parser String
+parseQuotedString = char '"' >> manyTill L.charLiteral (char '"')
+
+parseTerm :: Parser Term
+parseTerm =
+      parseConst
+  <|> parseVar
+  <|> parseFunc
+
+parseConst :: Parser Term
+parseConst = do
+  string "Const"
+  space
+  name <- parseQuotedString
+  return $ Const name
+
+parseVar :: Parser Term
+parseVar = do
+  string "Var"
+  space
+  name <- parseQuotedString
+  return $ Var name
+
+parseFunc :: Parser Term
+parseFunc = do
+  funcName <- parseQuotedString
+  s1 <- space
+  str <- parseQuotedString
+  s2 <- space
+  leftSquareBracket <- char '['
+  args <- parseParens (parseTerm `sepBy` char ',')
+  rightSquareBracket <- char ']'
+  return $ Func funcName args -- e.g., "f(x, y)"
+
+parseTruthValue :: Parser Prop
+parseTruthValue =
+      (string "True" >> return (TruthValue True))
+  <|> (string "False" >> return (TruthValue False))
+
+parseTer :: Parser Prop
+parseTer = do
+  string "Ter"
+  space
+  char '('
+  term <- parseTerm -- delegate parsing the inner term
+  char ')'
+  return $ Ter term
+
 
 -- Parse thing in parentheses.
-parens :: Parser a -> Parser a
-parens = between (symbol "(") (symbol ")")
+parseParens :: Parser a -> Parser a
+parseParens = between (symbol "(") (symbol ")")
 
 -- Parse a symbol (lexeme).
 symbol :: Text -> Parser Text
@@ -109,7 +148,6 @@ symbol = L.symbol spaceConsumer
 -- Consumer that ignores spaces.
 spaceConsumer :: Parser ()
 spaceConsumer = L.space space1 empty empty
-
 
 -- Parser for AST begins here.
 
@@ -123,7 +161,7 @@ bindNameParser = do
   name <- some letterChar
   _ <- char '"'
   _ <- space
-  prop <- lexeme $ parens propParser
+  prop <- lexeme $ parseParens parseProp
   return $ Bind name prop
 
 bindParser :: Parser AST
@@ -131,13 +169,13 @@ bindParser = do
   _ <- symbol "Bind"
   name <- some letterChar
   _ <- space
-  prop <- parens propParser
+  prop <- parseParens parseProp
   return $ Bind name prop
 
 pexpParser :: Parser AST
 pexpParser = do
   _ <- symbol "Pexp"
-  prop <- parens propParser
+  prop <- parseParens parseProp
   return $ Pexp prop
 
 astParser :: Parser AST

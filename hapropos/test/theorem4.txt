@@ -1,0 +1,3 @@
+Or (Ter (Const "P")) (Ter (Const "Q"))
+And (Or (Ter (Const "P")) (Ter (Const "Q"))) (Not (And (Ter Const "P") (Ter (Const "Q"))))
+Not (And (Ter (Const "P")) (Not (Ter (Const "P"))))

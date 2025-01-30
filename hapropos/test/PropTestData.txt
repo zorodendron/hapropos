@@ -1,0 +1,14 @@
+TruthValue True
+TruthValue False
+Ter (Const "P")
+Ter (Const "Q")
+Ter (Var "largestMammal")
+And (Ter (Const "P") (Ter (Const "Q")))
+Or (Ter (Const "P") (Ter (Const "Q")))
+Implies (Ter (Const "P") (Ter (Const "Q")))
+Implies (Ter (Const "P") (Not (Not (Ter (Const "Q")))))
+Implies (Ter (Const "Socrates is a man") (Ter (Const "Socrates is mortal")))
+Quant Exists "Socrates" Pred "isMortal" [Const "Socrates"]
+Quant Forall "x" Implies (Pred "isHuman" [Var "x"]) (Pred "isMortal" [Var "x"])
+Quant Exists "x" Pre "isMortal" [Var "x"]
+Quant Forall "x" (Not (And (Pred "isRedAllOver" [Var "x"])) (Pred "isGreenAllOver" [Var "x"]))

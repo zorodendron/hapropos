@@ -1,0 +1,3 @@
+Exists "x" (Pred "isX" [Var "x"])
+Not (Not (Exists "x" (Pred "isX" [Var "x"])))
+Not (And (Ter (Const "P")) (Not (Ter (Const "P"))))

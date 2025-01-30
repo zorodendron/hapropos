@@ -18,13 +18,14 @@ common warnings
 
 library
     import:           warnings
-    exposed-modules:  Prop, PLProp, SmallProp, Typeclasses.Typeclasses, Typeclasses.NormalForms, LiquidProp, AST,
-    other-modules:    
+    exposed-modules:  Prop, PLProp, SmallProp, Typeclasses.Typeclasses, Typeclasses.NormalForms, AST, Provers.Resolution
+    other-modules:
     -- other-extensions:
-    build-depends:    base, 
+    build-depends:    base,
                       vector ==0.13.1.0,
                       liquidhaskell >=0.9.8.1,
                       megaparsec ==9.6.1,
+                      containers ==0.7,
 		      text >=2.1,
                       parser-combinators ==1.3.0,
                       template-haskell
@@ -36,8 +37,7 @@ library
 --    type: exitcode-stdio-1.0
 --    hs-source-dirs: tests
 --    main-is: PCT.hs
---    build-depends: base ^>=4.17.2.1 
+--    build-depends: base ^>=4.17.2.1
 --                 , QuickCheck
 --                   Propos
 --    default-language: GHC2021
-  
